@@ -1,7 +1,11 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Course = sequelize.define('Course', {
-    id: DataTypes.INTEGER,
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     userId: DataTypes.INTEGER,
     title: DataTypes.STRING,
     description: DataTypes.TEXT,
