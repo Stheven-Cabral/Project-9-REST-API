@@ -3,7 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
-const { sequelize } = require('./models');
+const { sequelize, User, Course } = require('./models');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -22,6 +22,10 @@ sequelize.authenticate()
 .catch((err) => {
   console.error('Error occured', err);
 });
+
+// Sync models
+console.log('Synchronizing the models with the database...');
+  sequelize.sync();
 
 // TODO setup your api routes here
 
