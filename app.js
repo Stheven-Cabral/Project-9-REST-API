@@ -16,10 +16,6 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
-// Add routes
-app.use('/api', userRoutes);
-app.use('/api', courseRoutes);
-
 // Authenticate connection to the database
 sequelize.authenticate()
 .then(() => {
@@ -31,7 +27,7 @@ sequelize.authenticate()
 
 // Sync models
 console.log('Synchronizing the models with the database...');
-  sequelize.sync();
+sequelize.sync();
 
 // TODO setup your api routes here
 
@@ -41,6 +37,10 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+// Add routes
+app.use('/api', userRoutes);
+app.use('/api', courseRoutes);
 
 // send 404 if no other route matched
 app.use((req, res) => {

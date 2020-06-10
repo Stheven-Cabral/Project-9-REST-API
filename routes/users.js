@@ -4,8 +4,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('basic-auth');
 const bcryptjs = require('bcryptjs');
-const models = require('../models');
-const { User } = models;
+const User = require('../models').User;
 
 // Authentication middleware
 const authenticateUser = async (req, res, next) => {
@@ -40,7 +39,7 @@ const authenticateUser = async (req, res, next) => {
 };
 
 function asyncHandler (cb) {
-  return async (req,res,next)=> {
+  return async (req, res, next)=> {
     try {
       await cb(req,res,next);
     } catch(err) {
@@ -52,17 +51,18 @@ function asyncHandler (cb) {
 // GET /api/users 200 - Returns the currently authenticated user
 router.get('/users', authenticateUser, asyncHandler( async (req, res) => {
   const user = req.currentUser;
-  res.json({
-    name: `${user.firstName} ${user.lastName}`,
+  res.status(200).json({
+    firstName: user.firstName, 
+    lastName: user.lastName,
     email: user.emailAddress,
   });
 }));
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
-router.post('/users', asyncHander(async (req, res) => {
+router.post('/users', asyncHandler(async (req, res) => {
   const newUser = await req.body;
 
-  const errors = [];
+  let errors = [];
 
   if (!newUser.firstName) {
     errors.push('Please provide your "first name"');
@@ -81,15 +81,15 @@ router.post('/users', asyncHander(async (req, res) => {
   }
 
   if (errors.length > 0 ) {
-    res.status(400);json({errors: errors});
+    res.status(400).json({errors: errors});
   } else {
     // Hash the new user's password using bcryptjs
-    newUser.password = await bcryptjs.hashSync(newUser.password);
+    newUser.password = bcryptjs.hashSync(newUser.password);
 
     // Add new user with hashed password to database
     await User.create(newUser);
     
-    //Set response status to 201 and dnd response
+    //Set response status to 201 and end response
     return res.status(201).end();
   }
 }));
