@@ -59,7 +59,40 @@ router.get('/users', authenticateUser, asyncHandler( async (req, res) => {
 }));
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
+router.post('/users', asyncHander(async (req, res) => {
+  const newUser = await req.body;
 
+  const errors = [];
+
+  if (!newUser.firstName) {
+    errors.push('Please provide your "first name"');
+  }
+
+  if (!newUser.lastName) {
+    errors.push('Please provide your "last name"');
+  }
+
+  if (!newUser.emailAddress) {
+    errors.push('Please provide a valid "email"');
+  }
+
+  if (!newUser.password) {
+    errors.push('Please provide your a "password"');
+  }
+
+  if (errors.length > 0 ) {
+    res.status(400);json({errors: errors});
+  } else {
+    // Hash the new user's password using bcryptjs
+    newUser.password = await bcryptjs.hashSync(newUser.password);
+
+    // Add new user with hashed password to database
+    await User.create(newUser);
+    
+    //Set response status to 201 and dnd response
+    return res.status(201).end();
+  }
+}));
 
 
 module.exports = router;
