@@ -60,7 +60,9 @@ router.get('/users', authenticateUser, asyncHandler( async (req, res) => {
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/users', asyncHandler(async (req, res) => {
+  console.log(req);
   const newUser = await req.body;
+  console.log(newUser);
 
   let errors = [];
 
