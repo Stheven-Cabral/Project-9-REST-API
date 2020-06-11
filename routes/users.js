@@ -60,16 +60,32 @@ router.get('/users', authenticateUser, asyncHandler( async (req, res) => {
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/users', asyncHandler(async (req, res) => {
-  const newUser = await req.body;
+  let newUser;
 
-  // Hash the new user's password using bcryptjs
-  newUser.password = bcryptjs.hashSync(newUser.password);
-
-  // Add new user with hashed password to database
-  await User.create(newUser);
+  try {
+    newUser = await req.body;
+    
+    // Hash the new user's password using bcryptjs
+    if (newUser.password) {
+      newUser.password = bcryptjs.hashSync(newUser.password);
+    }
   
-  //Set response status to 201 and end response
-  return res.status(201).end();
+    // Add new user with hashed password to database 
+    await User.create(newUser);
+    
+    //Set response status to 201 and end response
+    res.status(201).location('/').end();
+
+  } catch (error) {
+    console.log(error);
+    // if (error.name === 'ValidationError') {
+    //   console.log(error);
+    //   const errors = await error.errors.map( err => err.message);
+    //   res.status(400).json({ errors: errors});
+    // } else {
+    //   throw error;
+    // }
+  }
 }));
 
 

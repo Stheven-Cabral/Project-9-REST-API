@@ -8,19 +8,39 @@ module.exports = (sequelize, DataTypes) => {
     },
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false
+      // allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: "Please provide a first name"
+        }
+      }
     },
     lastName: {
       type: DataTypes.STRING,
-      allowNull: false
+      // allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: "Please provide a last name"
+        }
+      }
     },
     emailAddress: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: DataTypes.STRING
+      // allowNull: false,
+      // validate: {
+      //   isEmail: {
+      //     msg: "Please provide a valid email"
+      //   }
+      // }
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      // allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: "Please provide a password."
+        }
+      }
     }
   }, {});
   User.associate = function(models) {
