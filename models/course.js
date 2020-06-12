@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     estimatedTime: DataTypes.STRING,
     materialsNeeded: DataTypes.STRING
   }, {});
+  
   Course.associate = function(models) {
     // associations can be defined here
     Course.belongsTo(models.User, { 

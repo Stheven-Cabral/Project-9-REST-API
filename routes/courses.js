@@ -36,8 +36,15 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 router.post('/courses', asyncHandler(async (req, res) => {
   let course;
   try {
-    course = await Course.create(req.body);
-    res.status(201).location('/' + req.params.id).end()
+    course = await Course.create({
+      title: req.body.title,
+      description: req.body.description,
+      estimatedTime: req.body.estimatedTime,
+      materialsNeeded: req.body.materialsNeeded,
+      // Change this when you add authentication
+      userId: req.body.userId,
+    });
+    res.status(201).location('/courses/' + course.id).end();
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {
       const errors = await error.errors.map( err => err.message);
@@ -51,22 +58,27 @@ router.post('/courses', asyncHandler(async (req, res) => {
 // PUT /api/courses/:id 204 - Updates a course and returns no content
 router.put('/courses/:id', asyncHandler( async (req, res) => {
   let course;
-  try {
-    course = await Course.update(req.body, {where: {id: req.params.id}});
-    res.status(204).json({ course: course});
-  } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      const errors = await error.errors.map( err => err.message);
-      res.status(400).json({ errors: errors });
-    } else {
-      throw error;
+  if (req.body.title || req.body.description || req.body.estimatedTime || req.body.materialsNeeded) {
+    try {
+      course = await Course.update(req.body, {where: {id: req.params.id}});
+      res.status(204).end();
+    } catch (error) {
+      if (error.name === 'SequelizeValidationError') {
+        const errors = await error.errors.map( err => err.message);
+        res.status(400).json({ errors: errors });
+      } else {
+        throw error;
+      }
     }
+  } else {
+    res.status(400).json({ message: 'Provide a course title and description'});
   }
 }));
 
 // DELETE /api/courses/:id 204 - Deletes a course and returns no content
 router.delete('/courses/:id', asyncHandler(async (req, res) => {
-  course = await Course.findByPk(req.params.id);
+  console.log(req.params);
+  const course = await Course.findByPk(req.params.id);
   await Course.destroy(course);
   res.status(204).end();
 }));
