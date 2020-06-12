@@ -33,10 +33,9 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/courses 201 - Creates a course, sets the Location header to the URI for the course, and returns no content
-router.post('/courses', asyncHandler(async (req, res) => {
-  let course;
+router.post('/courses', asyncHandler(async (req, res, next) => {
   try {
-    course = await Course.create({
+    await Course.create({
       title: req.body.title,
       description: req.body.description,
       estimatedTime: req.body.estimatedTime,
@@ -44,21 +43,16 @@ router.post('/courses', asyncHandler(async (req, res) => {
       // Change this when you add authentication
       userId: req.body.userId,
     });
-    res.status(201).location('/courses/' + course.id).end();
-  } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      const errors = await error.errors.map( err => err.message);
-      res.status(400).json({ errors: errors });
-    } else {
-      throw error;
-    }
+    res.status(201).location('/courses/' + req.body.id).end();
+  } catch (err) {
+    next(err);
   }
 }));
 
 // PUT /api/courses/:id 204 - Updates a course and returns no content
 router.put('/courses/:id', asyncHandler( async (req, res) => {
   let course;
-  if (req.body.title || req.body.description || req.body.estimatedTime || req.body.materialsNeeded) {
+  if (req.body.title && req.body.description) {
     try {
       course = await Course.update(req.body, {where: {id: req.params.id}});
       res.status(204).end();

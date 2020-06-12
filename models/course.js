@@ -8,16 +8,32 @@ module.exports = (sequelize, DataTypes) => {
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Please provide a title'
+        },
+        notEmpty: {
+          msg: 'Please enter a title for the course'
+        }
+      }
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Please provide a course description'
+        },
+        notEmpty: {
+          msg: ' Please enter a course description'
+        }
+      }
     },
     estimatedTime: DataTypes.STRING,
     materialsNeeded: DataTypes.STRING
   }, {});
-  
+
   Course.associate = function(models) {
     // associations can be defined here
     Course.belongsTo(models.User, { 
