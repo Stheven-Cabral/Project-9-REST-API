@@ -50,19 +50,14 @@ router.post('/courses', asyncHandler(async (req, res, next) => {
 }));
 
 // PUT /api/courses/:id 204 - Updates a course and returns no content
-router.put('/courses/:id', asyncHandler( async (req, res) => {
+router.put('/courses/:id', asyncHandler( async (req, res, next) => {
   let course;
   if (req.body.title && req.body.description) {
     try {
       course = await Course.update(req.body, {where: {id: req.params.id}});
       res.status(204).end();
-    } catch (error) {
-      if (error.name === 'SequelizeValidationError') {
-        const errors = await error.errors.map( err => err.message);
-        res.status(400).json({ errors: errors });
-      } else {
-        throw error;
-      }
+    } catch (err) {
+      next(err);
     }
   } else {
     res.status(400).json({ message: 'Provide a course title and description'});
