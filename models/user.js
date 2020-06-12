@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notNull: {
           msg: "Please provide a first name"
+        },
+        notEmpty: {
+          msg: "Please enter your first name."
         }
       }
     },
@@ -21,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notNull: {
           msg: "Please provide a last name"
+        },
+        notEmpty: {
+          msg: "Please enter your last name."
         }
       }
     },
@@ -30,6 +36,9 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notNull: {
           msg: "Please provide a valid email"
+        },
+        notEmpty: {
+          msg: "Please enter an email address."
         }
       }
     },
@@ -38,6 +47,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notNull: {
+          msg: "Please provide a password."
+        },
+        notEmpty: {
           msg: "Please provide a password."
         }
       }

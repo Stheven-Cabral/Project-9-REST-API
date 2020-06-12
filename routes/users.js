@@ -37,6 +37,9 @@ router.post('/users', asyncHandler(async (req, res, next) => {
     // Hash the new user's password using bcryptjs
     if (newUser.password) {
       newUser.password = bcryptjs.hashSync(newUser.password);
+    } else {
+      throw new Error("I'm sorry. Something went wrong.");
+      
     }
   
     // Add new user with hashed password to database 
