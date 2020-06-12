@@ -11,7 +11,7 @@ function asyncHandler (cb) {
     try {
       await cb(req,res,next);
     } catch(err) {
-      res.send(err);
+      next(err);
     }
   }
 }
