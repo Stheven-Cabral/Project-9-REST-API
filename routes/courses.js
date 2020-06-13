@@ -17,13 +17,20 @@ function asyncHandler (cb) {
 
 // GET /api/courses 200 - Returns a list of courses (including the user that owns each course)
 router.get('/courses', asyncHandler(async (req, res) => {
-  const courses = await Course.findAll({ include: User });
+  const courses = await Course.findAll({ attributes: {
+    exclude: ['createdAt', 'updatedAt']
+  }, 
+  include: User });
   res.status(200).json({ courses: courses });
 }));
 
 // GET /api/courses/:id 200 - Returns a the course (including the user that owns the course) for the provided course ID
 router.get('/courses/:id', asyncHandler(async (req, res) => {
-  const course = await Course.findByPk(req.params.id, {include: User});
+  const course = await Course.findByPk(req.params.id, {
+    attributes: {
+      exclude: ['createdAt', 'updatedAt']
+    }, 
+    include: User});
 
   if (course) {
     res.status(200).json({ course: course });
@@ -33,15 +40,14 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/courses 201 - Creates a course, sets the Location header to the URI for the course, and returns no content
-router.post('/courses', asyncHandler(async (req, res, next) => {
+router.post('/courses', authenticateUser, asyncHandler(async (req, res, next) => {
   try {
     await Course.create({
       title: req.body.title,
       description: req.body.description,
       estimatedTime: req.body.estimatedTime,
       materialsNeeded: req.body.materialsNeeded,
-      // Change this when you add authentication
-      userId: req.body.userId,
+      userId: req.currentUser.id,
     });
     res.status(201).location('/courses/' + req.body.id).end();
   } catch (err) {
@@ -50,28 +56,38 @@ router.post('/courses', asyncHandler(async (req, res, next) => {
 }));
 
 // PUT /api/courses/:id 204 - Updates a course and returns no content
-router.put('/courses/:id', asyncHandler( async (req, res, next) => {
-  let course;
-  if (req.body.title && req.body.description) {
-    try {
-      course = await Course.update(req.body, {where: {id: req.params.id}});
-      res.status(204).end();
-    } catch (err) {
-      next(err);
+router.put('/courses/:id', authenticateUser, asyncHandler( async (req, res, next) => {
+  const course = await Course.findByPk(req.params.id);
+  if (course.Id === req.currentUser.Id) {
+    if (req.body.title && req.body.description) {
+      try {
+        await Course.update(req.body, {where: {id: req.params.id}});
+        res.status(204).end();
+      } catch (err) {
+        next(err);
+      }
+    } else {
+      res.status(400).json({ message: 'Provide a course title and description'});
     }
   } else {
-    res.status(400).json({ message: 'Provide a course title and description'});
+    res.status(403).json({message: 'You are not authorized to edit this course.'});
   }
 }));
 
 // DELETE /api/courses/:id 204 - Deletes a course and returns no content
-router.delete('/courses/:id', asyncHandler(async (req, res) => {
-  await Course.destroy({
-    where: {
-      id: req.params.id
-    }
-  });
-  res.status(204).end();
+router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
+  const course = await Course.findByPk(req.params.id);
+
+  if (course.userId === req.currentUser.id) {
+    await Course.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+    res.status(204).end();
+  } else {
+    res.status(403).json({message: 'You are not authorized to delete this course.'});
+  }
 }));
 
 
