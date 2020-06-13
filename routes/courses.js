@@ -5,6 +5,8 @@ const router = express.Router();
 const {Course, User} = require('../models');
 const { authenticateUser } = require('./middleware/authenticate-user');
 
+
+// asynHandler middleware - catches any route errors and uses next to pass any errors to the global error handler.
 function asyncHandler (cb) {
   return async (req, res, next)=> {
     try {
@@ -15,7 +17,8 @@ function asyncHandler (cb) {
   }
 }
 
-// GET /api/courses 200 - Returns a list of courses (including the user that owns each course)
+
+// GET /api/courses 200 - Returns a list of courses (including the user that owns each course, but excluding 'createdAt' amd 'updatedAt' attributes)
 router.get('/courses', asyncHandler(async (req, res) => {
   const courses = await Course.findAll({ attributes: {
     exclude: ['createdAt', 'updatedAt']
@@ -24,7 +27,8 @@ router.get('/courses', asyncHandler(async (req, res) => {
   res.status(200).json({ courses: courses });
 }));
 
-// GET /api/courses/:id 200 - Returns a the course (including the user that owns the course) for the provided course ID
+
+// GET /api/courses/:id 200 - Returns a the course (including the user that owns the course, but excluding 'createdAt' amd 'updatedAt' attributes) for the provided course ID
 router.get('/courses/:id', asyncHandler(async (req, res) => {
   const course = await Course.findByPk(req.params.id, {
     attributes: {
@@ -42,15 +46,17 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 
 // POST /api/courses 201 - Creates a course, sets the Location header to the URI for the course, and returns no content
 router.post('/courses', authenticateUser, asyncHandler(async (req, res, next) => {
+  let course;
+
   try {
-    await Course.create({
+    course = await Course.create({
       title: req.body.title,
       description: req.body.description,
       estimatedTime: req.body.estimatedTime,
       materialsNeeded: req.body.materialsNeeded,
       userId: req.currentUser.id,
     });
-    res.status(201).location('/courses/' + req.body.id).end();
+    res.status(201).location('/courses/' + course.id).end();
   } catch (err) {
     next(err);
   }
@@ -60,7 +66,7 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res, next) =>
 // PUT /api/courses/:id 204 - Updates a course and returns no content
 router.put('/courses/:id', authenticateUser, asyncHandler( async (req, res, next) => {
   const course = await Course.findByPk(req.params.id);
-  if (course.Id === req.currentUser.Id) {
+  if (course.userId === req.currentUser.id) {
     if (req.body.title && req.body.description) {
       try {
         await Course.update(req.body, {where: {id: req.params.id}});
@@ -69,7 +75,7 @@ router.put('/courses/:id', authenticateUser, asyncHandler( async (req, res, next
         next(err);
       }
     } else {
-      res.status(400).json({ message: 'Provide a course title and description'});
+      res.status(400).json({ message: 'Update requires both a title and a description.'});
     }
   } else {
     res.status(403).json({message: 'You are not authorized to edit this course.'});
@@ -85,8 +91,7 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) =>
     await Course.destroy({
       where: {
         id: req.params.id
-      },
-      cascade: true
+      }
     });
     res.status(204).end();
   } else {
