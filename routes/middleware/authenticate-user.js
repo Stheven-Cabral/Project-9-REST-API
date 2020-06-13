@@ -24,7 +24,7 @@ const authenticateUser = async (req, res, next) => {
         message = `Authentication failed for user: ${user.emailAddress}`;
       }
     } else {
-      message = `User not found for user: ${credentials.name}`;
+      message = `User not found with email address: ${credentials.name}`;
     }
   } else {
     message = `Authorization header not found`;
@@ -32,7 +32,7 @@ const authenticateUser = async (req, res, next) => {
 
   if (message) {
     console.warn(message);
-    res.status(401).json({ message: 'Access has Been Denied' });
+    res.status(401).json({ message: message });
   } else {
     next();
   }

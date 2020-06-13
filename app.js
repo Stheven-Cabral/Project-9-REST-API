@@ -22,17 +22,15 @@ app.use(morgan('dev'));
 // Authenticate connection to the database
 sequelize.authenticate()
 .then(() => {
-  console.log('Connection Succesful');
+  console.log('Connection to Database Succesful');
 })
 .catch((err) => {
-  console.error('Error occured', err);
+  console.error('Connection to Database Error', err);
 });
 
 // Sync models
 console.log('Synchronizing the models with the database...');
 sequelize.sync();
-
-// TODO setup your api routes here
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
@@ -52,7 +50,7 @@ app.use((req, res) => {
   });
 });
 
-// setup a global error handler
+// Global error handler
 app.use(async (err, req, res, next) => {
   if (enableGlobalErrorLogging) {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);

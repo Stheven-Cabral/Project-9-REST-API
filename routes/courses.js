@@ -39,6 +39,7 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
   }
 }));
 
+
 // POST /api/courses 201 - Creates a course, sets the Location header to the URI for the course, and returns no content
 router.post('/courses', authenticateUser, asyncHandler(async (req, res, next) => {
   try {
@@ -54,6 +55,7 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res, next) =>
     next(err);
   }
 }));
+
 
 // PUT /api/courses/:id 204 - Updates a course and returns no content
 router.put('/courses/:id', authenticateUser, asyncHandler( async (req, res, next) => {
@@ -74,6 +76,7 @@ router.put('/courses/:id', authenticateUser, asyncHandler( async (req, res, next
   }
 }));
 
+
 // DELETE /api/courses/:id 204 - Deletes a course and returns no content
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
   const course = await Course.findByPk(req.params.id);
@@ -82,7 +85,8 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) =>
     await Course.destroy({
       where: {
         id: req.params.id
-      }
+      },
+      cascade: true
     });
     res.status(204).end();
   } else {

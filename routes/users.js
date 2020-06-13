@@ -6,6 +6,8 @@ const bcryptjs = require('bcryptjs');
 const { authenticateUser } = require('./middleware/authenticate-user');
 const User = require('../models').User;
 
+
+// asynHandler middleware - catches any route errors and uses next to pass any errors to the global error handler.
 function asyncHandler (cb) {
   return async (req, res, next)=> {
     try {
@@ -15,6 +17,7 @@ function asyncHandler (cb) {
     }
   }
 }
+
 
 // GET /api/users 200 - Returns the currently authenticated user
 router.get('/users', authenticateUser, asyncHandler( async (req, res) => {
@@ -26,6 +29,7 @@ router.get('/users', authenticateUser, asyncHandler( async (req, res) => {
 
   res.status(200).json(user);
 }));
+
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/users', asyncHandler(async (req, res, next) => {
