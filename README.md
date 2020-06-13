@@ -1,16 +1,10 @@
 
-# Full Stack JavaScript Techdegree v2 - REST API Project
+# Full Stack JavaScript Techdegree REST API Project
 
 ## Overview of the Provided Project Files
+In this project, I created a REST API using Express. The API provides a way for users to administer a school database containing information about courses. Users can interact with the database by retrieving a list of courses, as well as adding, updating and deleting courses in the database.
 
-We've supplied the following files for you to use: 
-
-* The `seed` folder contains a starting set of data for your database in the form of a JSON file (`data.json`) and a collection of files (`context.js`, `database.js`, and `index.js`) that can be used to create your app's database and populate it with data (we'll explain how to do that below).
-* We've included a `.gitignore` file to ensure that the `node_modules` folder doesn't get pushed to your GitHub repo.
-* The `app.js` file configures Express to serve a simple REST API. We've also configured the `morgan` npm package to log HTTP requests/responses to the console. You'll update this file with the routes for the API. You'll update this file with the routes for the API.
-* The `nodemon.js` file configures the nodemon Node.js module, which we are using to run your REST API.
-* The `package.json` file (and the associated `package-lock.json` file) contain the project's npm configuration, which includes the project's dependencies.
-* The `RESTAPI.postman_collection.json` file is a collection of Postman requests that you can use to test and explore your REST API.
+I used Node.js and Express to create API routes and the Sequelize ORM for data modeling and validation. I used the relational database management system SQLite to view my database. To test the application, I used Postman, a popular application for exploring and testing REST APIs.
 
 ## Getting Started
 
@@ -36,3 +30,4 @@ npm start
 ```
 
 To test the Express server, browse to the URL [http://localhost:5000/](http://localhost:5000/).
+or use a development platform such as Postman [https://www.postman.com/](https://www.postman.com/).
