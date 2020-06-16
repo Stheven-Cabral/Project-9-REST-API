@@ -68,14 +68,31 @@ router.put('/courses/:id', authenticateUser, asyncHandler( async (req, res, next
   const course = await Course.findByPk(req.params.id);
   if (course.userId === req.currentUser.id) {
     if (req.body.title && req.body.description) {
-      try {
-        await Course.update(req.body, {where: {id: req.params.id}});
-        res.status(204).end();
-      } catch (err) {
-        next(err);
+      if (req.body.title) {
+        if (req.body.description) {
+          try {
+            await Course.update(req.body, {where: {id: req.params.id}});
+            res.status(204).end();
+          } catch (err) {
+            next(err);
+          }
+        } else {
+          res.status(400).json({ 
+            message: 'Something went wrong.',
+            error: 'Validation Error - Please provide a description.'
+          });
+        }
+      } else {
+        res.status(400).json({ 
+          message: 'Something went wrong.',
+          error: 'Validation Error - Please provide an title.'
+        });
       }
     } else {
-      res.status(400).json({ message: 'Update requires both a title and a description.'});
+      res.status(400).json({ 
+        message: 'Something went wrong.',
+        error: ['Validation Error - Please provide an title.', 'Validation Error = Please provide a description']
+      });
     }
   } else {
     res.status(403).json({message: 'You are not authorized to edit this course.'});
