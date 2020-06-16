@@ -36,22 +36,29 @@ router.post('/users', asyncHandler(async (req, res, next) => {
 
   try {
     const newUser = await req.body;
-    const existingUser = await User.findOne({
-      where: {
-        emailAddress: newUser.emailAddress
-      }
-    });
+    let existingUser;
+
+    if (newUser.emailAddress) {
+      existingUser = await User.findOne({
+        where: {
+          emailAddress: newUser.emailAddress
+        }
+      });
+    }
     
     if (!existingUser) {
       // Hash the new user's password using bcryptjs
       if (newUser.password) {
         newUser.password = bcryptjs.hashSync(newUser.password);
-      } else {
-        throw new Error("I'm sorry. Something went wrong.");
       }
 
       // Add new user with hashed password to database 
-      await User.create(newUser);
+      await User.create({
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        emailAddress: newUser.emailAddress,
+        password: newUser.password
+      });
     
       //Set response status to 201 and end response
       res.status(201).location('/').end();
